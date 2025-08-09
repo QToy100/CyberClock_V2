@@ -6,7 +6,6 @@
 #include "esp_log.h"
 #include "driver/i2s.h"
 #include "esp_err.h"
-#include "audio_codecs/es8311_audio_codec.h"
 #include "driver/i2c.h"
 #include "driver/gpio.h"
 #include "CyberClock.h"
@@ -44,24 +43,24 @@ static void InitNVS() {
     }
 }
 
-static void InitCodec() {
-    Es8311AudioCodec codec(
-        nullptr,
-        I2C_NUM_0,
-        16000,
-        16000,
-        GPIO_NUM_NC,
-        GPIO_NUM_NC,
-        GPIO_NUM_NC,
-        GPIO_NUM_NC,
-        GPIO_NUM_NC,
-        GPIO_NUM_NC,
-        0x18,
-        true
-    );
-    codec.EnableOutput(true);
-    codec.SetOutputVolume(80);
-}
+// static void InitCodec() {
+//     Es8311AudioCodec codec(
+//         nullptr,
+//         I2C_NUM_0,
+//         16000,
+//         16000,
+//         GPIO_NUM_NC,
+//         GPIO_NUM_NC,
+//         GPIO_NUM_NC,
+//         GPIO_NUM_NC,
+//         GPIO_NUM_NC,
+//         GPIO_NUM_NC,
+//         0x18,
+//         true
+//     );
+//     codec.EnableOutput(true);
+//     codec.SetOutputVolume(80);
+// }
 
 static void InitParams(){
     server_time_ready_semaphore = xSemaphoreCreateBinary();
