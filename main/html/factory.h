@@ -1,0 +1,128 @@
+#ifndef _FACTORY_HTML_
+#define _FACTORY_HTML_
+
+const char factory_html[] = R"rawliteral(
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title id="title-deviceinfo">Device Info</title>
+    <style>
+        body { background: #36393e; color: #bfbfbf; font-family: sans-serif; }
+        .container { max-width: 550px; margin: 40px auto; background: #232428; border-radius: 10px; padding: 32px 24px; box-shadow: 0 2px 12px #0003; }
+        h2 { color: #2675eb; text-align: center; margin-bottom: 32px; }
+        .row { display: flex; align-items: center; margin-bottom: 24px; }
+        .label { flex: 0 0 120px; font-weight: bold; }
+        .value { flex: 1; word-break: break-all; }
+        .btn { background: #2675eb; color: #fff; border: none; border-radius: 4px; padding: 7px 20px; font-size: 1em; margin-left: 16px; cursor: pointer; }
+        .btn:active { background: #1453b8; }
+        .tip { color: #aaa; font-size: 0.95em; margin-top: 16px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 id="title-deviceinfo-h2">Device Info</h2>
+        <div class="row">
+            <span class="label" id="label-uuid">UUID:</span>
+            <span class="value" id="uuid">Loading...</span>
+            <button class="btn" id="btn-clear" onclick="clearUUID()">Clear</button>
+        </div>
+        <div class="row">
+            <span class="label" id="label-mac">MAC:</span>
+            <span class="value" id="mac">Loading...</span>
+            <button class="btn" id="btn-random" onclick="randomMAC()">Random</button>
+            <button class="btn" id="btn-default" onclick="defaultMAC()">Default</button>
+        </div>
+        <div class="tip" id="tip-area">
+            <div id="tip-clear">Click "Clear" to reset UUID .</div>
+            <div id="tip-random">Click "Random" to generate and set a new MAC address .</div>
+            <div id="tip-default">Click "Default" to reset MAC address to default .</div>
+        </div>
+    </div>
+    <script>
+        // 多语言资源
+        const LANG_RES = {
+            en: {
+                DEVICE_INFO: "Device Info",
+                UUID: "UUID:",
+                MAC: "MAC:",
+                CLEAR: "Clear",
+                RANDOM: "Random",
+                DEFAULT: "Default",
+                TIP_CLEAR: 'Click "Clear" to reset UUID .',
+                TIP_RANDOM: 'Click "Random" to generate and set a new MAC address .',
+                TIP_DEFAULT: 'Click "Default" to reset MAC address to default .',
+                MAC_ALERT: "MAC address reset to default. Please restart the device for changes to take effect.",
+                MAC_RANDOM_ALERT: "MAC address reset to default. Please restart the device for changes to take effect."
+            },
+            zh: {
+                DEVICE_INFO: "设备信息",
+                UUID: "UUID：",
+                MAC: "MAC：",
+                CLEAR: "清除",
+                RANDOM: "随机",
+                DEFAULT: "恢复默认",
+                TIP_CLEAR: '点击“清除”可重置UUID。',
+                TIP_RANDOM: '点击“随机”可生成并设置新的MAC地址。',
+                TIP_DEFAULT: '点击“恢复默认”可将MAC地址重置为出厂值。',
+                MAC_ALERT: "MAC地址已恢复为默认，请重启设备以生效。",
+                MAC_RANDOM_ALERT: "MAC地址已重置，请重启设备以生效。"
+            }
+        };
+        function getLang() {
+            const lang = navigator.language || navigator.userLanguage || '';
+            return lang.startsWith('zh') ? 'zh' : 'en';
+        }
+        const RES = LANG_RES[getLang()];
+
+        // 设置多语言文本
+        window.addEventListener('DOMContentLoaded', function() {
+            document.title = RES.DEVICE_INFO;
+            document.getElementById('title-deviceinfo').textContent = RES.DEVICE_INFO;
+            document.getElementById('title-deviceinfo-h2').textContent = RES.DEVICE_INFO;
+            document.getElementById('label-uuid').textContent = RES.UUID;
+            document.getElementById('label-mac').textContent = RES.MAC;
+            document.getElementById('btn-clear').textContent = RES.CLEAR;
+            document.getElementById('btn-random').textContent = RES.RANDOM;
+            document.getElementById('btn-default').textContent = RES.DEFAULT;
+            document.getElementById('tip-clear').textContent = RES.TIP_CLEAR;
+            document.getElementById('tip-random').textContent = RES.TIP_RANDOM;
+            document.getElementById('tip-default').textContent = RES.TIP_DEFAULT;
+        });
+
+        function fetchInfo() {
+            fetch('/get_config')
+                .then(function(response) { return response.json(); })
+                .then(function(cfg) {
+                    document.getElementById('uuid').textContent = (cfg.uuid !== undefined) ? cfg.uuid : '(none)';
+                    document.getElementById('mac').textContent = (cfg.mac !== undefined) ? cfg.mac : '(none)';
+                })
+                .catch(function() {
+                    document.getElementById('uuid').textContent = '(error)';
+                    document.getElementById('mac').textContent = '(error)';
+                });
+        }
+        function clearUUID() {
+            fetch('/set?uuid=NULL').then(() => setTimeout(fetchInfo, 500));
+            setTimeout(fetchInfo, 500);
+        }
+        function randomMAC() {
+            fetch('/set?mac=new').then(() => setTimeout(fetchInfo, 500));
+            setTimeout(fetchInfo, 500);
+            alert(RES.MAC_RANDOM_ALERT);
+        }
+        function defaultMAC() {
+            fetch('/set?mac=default').then(() => setTimeout(fetchInfo, 500));
+            alert(RES.MAC_ALERT);
+        }
+        window.onload = function() {
+            fetchInfo();
+        };
+    </script>
+</body>
+</html>
+
+)rawliteral";
+
+#endif

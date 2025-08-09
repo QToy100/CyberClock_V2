@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Firmware Update</title>
+    <meta charset="utf-8">
+    <style>
+        body { background: #36393e; color: #bfbfbf; font-family: sans-serif; }
+        h1 { color: #e90a08; }
+        .center-container {
+            max-width: 1000px;
+            margin: 40px auto 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        .progress-container {
+            width: 100%;
+            max-width: 1000px;
+            background: #222;
+            border-radius: 6px;
+            margin: 20px 0;
+            box-sizing: border-box;
+        }
+        .progress-bar {
+            width: 0%;
+            height: 24px;
+            background: #2196F3;
+            border-radius: 6px;
+            text-align: center;
+            color: #fff;
+            transition: width 0.2s;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        @media (max-width: 1000px) {
+            .progress-container {
+                max-width: 100vw;
+            }
+        }
+        .upgrade-tip {
+            margin-top: 32px;
+            color: #ffb300;
+            background: #222;
+            border-radius: 6px;
+            padding: 16px 24px;
+            font-size: 1.1em;
+            text-align: center;
+            max-width: 600px;
+        }
+        .upload-btn { background: #2675eb; color: #fff; border: none; border-radius: 4px; padding: 10px 24px; font-size: 16px; cursor: pointer; }
+        .upload-btn:disabled { background: #888; }
+        .upload-success {
+            display: inline-block;
+            background: #1ecb5c;
+            color: #fff;
+            font-size: 1.5em;
+            font-weight: bold;
+            padding: 12px 24px;
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="center-container">
+        <h1 id="title-firmware">Firmware Update</h1>
+        <form id="uploadForm" method="POST" action="/update" enctype="multipart/form-data">
+            <input type="file" name="firmware" id="firmware" required>
+            <button type="submit" class="upload-btn" id="btn-upload">Upload</button>
+        </form>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar">0%</div>
+        </div>
+        <div id="status" class="center"></div>
+        <p><span id="fw-version"></span> <span id="label-email">E-Mail:</span> <a href="mailto:qtoy100@gmail.com" style="color:#888888;text-decoration:underline;">qtoy100@gmail.com</a></p>
+        <div class="upgrade-tip" id="upgrade-tip">
+            <b id="tip-notice">Notice:</b> The upgrade process takes about 2~3 minutes. <br>
+            Please do not power off the device during the upgrade. <br>
+            The device will automatically reboot after the upgrade is complete.
+        </div>
+    </div>
+    <script>
+    // 多语言资源
+    const LANG_RES = {
+        en: {
+            FIRMWARE_UPDATE: "Firmware Update",
+            UPLOAD: "Upload",
+            EMAIL: "E-Mail:",
+            NOTICE: "Notice:",
+            UPGRADE_TIP_1: "The upgrade process takes about 2~3 minutes.",
+            UPGRADE_TIP_2: "Please do not power off the device during the upgrade.",
+            UPGRADE_TIP_3: "The device will automatically reboot after the upgrade is complete.",
+            UPLOAD_COMPLETE: "Upload complete. Device will restart if update is successful.",
+            UPLOAD_FAILED: "Upload failed: ",
+            UPLOAD_ERROR: "Upload error.",
+            UPLOADING: "Uploading..."
+        },
+        zh: {
+            FIRMWARE_UPDATE: "固件升级",
+            UPLOAD: "上传",
+            EMAIL: "邮箱：",
+            NOTICE: "注意：",
+            UPGRADE_TIP_1: "升级过程大约需要2~3分钟。",
+            UPGRADE_TIP_2: "升级过程中请勿断电。",
+            UPGRADE_TIP_3: "升级完成后设备会自动重启。",
+            UPLOAD_COMPLETE: "上传完成，若升级成功设备将自动重启。",
+            UPLOAD_FAILED: "上传失败：",
+            UPLOAD_ERROR: "上传出错。",
+            UPLOADING: "正在上传..."
+        }
+    };
+    function getLang() {
+        const lang = navigator.language || navigator.userLanguage || '';
+        return lang.startsWith('zh') ? 'zh' : 'en';
+    }
+    const RES = LANG_RES[getLang()];
+
+    // 设置多语言文本
+    window.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('title-firmware').textContent = RES.FIRMWARE_UPDATE;
+        document.getElementById('btn-upload').textContent = RES.UPLOAD;
+        document.getElementById('label-email').textContent = RES.EMAIL;
+        document.getElementById('tip-notice').textContent = RES.NOTICE;
+        document.getElementById('upgrade-tip').innerHTML =
+            `<b id="tip-notice">${RES.NOTICE}</b> ${RES.UPGRADE_TIP_1}<br>${RES.UPGRADE_TIP_2}<br>${RES.UPGRADE_TIP_3}`;
+    });
+
+    // 获取固件版本号并显示
+    window.onload = function() {
+        fetch('/get_config').then(function(resp){
+            return resp.json();
+        }).then(function(cfg){
+            if(cfg.version) {
+                var fwVer = document.getElementById('fw-version');
+                if(fwVer) fwVer.textContent = cfg.version;
+            }
+        });
+    };
+    const form = document.getElementById('uploadForm');
+    const progressBar = document.getElementById('progressBar');
+    const status = document.getElementById('status');
+    form.onsubmit = function(e) {
+        e.preventDefault();
+        const fileInput = document.getElementById('firmware');
+        if (!fileInput.files.length) return;
+        const file = fileInput.files[0];
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/update', true);
+        xhr.upload.onprogress = function(e) {
+            if (e.lengthComputable) {
+                const percent = Math.round((e.loaded / e.total) * 100);
+                progressBar.style.width = percent + '%';
+                progressBar.textContent = percent + '%';
+            }
+        };
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                progressBar.style.width = '100%';
+                progressBar.textContent = '100%';
+                status.innerHTML = `<span class="upload-success">${RES.UPLOAD_COMPLETE}</span>`;
+            } else {
+                status.textContent = RES.UPLOAD_FAILED + xhr.statusText;
+            }
+        };
+        xhr.onerror = function() {
+            status.textContent = RES.UPLOAD_ERROR;
+        };
+        const formData = new FormData();
+        formData.append('firmware', file);
+        xhr.send(formData);
+        status.textContent = RES.UPLOADING;
+        progressBar.style.width = '0%';
+        progressBar.textContent = '0%';
+    };
+    </script>
+</body>
+</html>

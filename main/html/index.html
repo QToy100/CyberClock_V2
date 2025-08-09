@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.8, minimal-ui">
+    <meta name="theme-color" content="#36393E" />
+    <title>CyberClock</title>
+    <style>
+        /* 全部CSS内容，未省略 */
+        body {
+            background: #36393e;
+            color: #bfbfbf;
+            font-family: sans-serif;
+            margin: 0;
+        }
+        h1 {
+            font-size: 1.7rem;
+            margin-top: 1rem;
+            background: #2f3136;
+            color: #bfbfbb;
+            padding: 0.2em 1em;
+            border-radius: 3px;
+            border-left: solid #e90a08 5px;
+            font-weight: 100;
+        }
+        h2 {
+            font-size: 1.1rem;
+            margin-top: 1rem;
+            background: #2f3136;
+            color: #bfbfbb;
+            padding: 0.4em 1.8em;
+            border-radius: 3px;
+            border-left: solid #4974a9 5px;
+            font-weight: 100;
+        }
+        table{
+            border-collapse: collapse;
+        }
+        .left { float: left; }
+        .right { float: right; }
+        .bold { font-weight: bold; }
+        .red{ color: #F04747; }
+        .green{ color:#43B581; }
+        .clear { clear: both; }
+        .centered{ text-align: center; }
+        .select{ width: 98px !important; padding: 0 !important; }
+        .selected{ background: #4974a9; }
+        .status{ width: 120px; padding-left: 8px; }
+        .labelFix { line-height: 40px; }
+        #error {
+            text-align: center;
+            color: #fff;
+            background: #af3535;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        #repo,#model,#copyright{
+            font-size: 0.95em;
+            text-align: center;
+            margin-top: 1em;
+            margin-bottom: 1em;
+        }
+        .btn-theme{
+            width: 290px;
+            margin-left: 10px;
+            margin-top: 10px;
+        }
+        .hide { display: none; }
+        .show {
+            display: block !important;
+            animation-name: fadeIn;
+            animation-duration: 1s;
+        }
+        @keyframes fadeIn {
+            0%   {opacity: 0;}
+            100% {opacity: 1;}
+        }
+        hr { background: #3e4146; }
+        a { color:#e7af12; text-decoration: none; }
+        a:hover { color: #95b8e4; }
+        li{ margin: 4px 0; }
+        .meter_background{ background: #42464D; width: 100%; min-width: 90px; }
+        .meter_forground{ color: #fff; padding: 4px 0; }
+        .meter_green{ background: #43B581; }
+        .meter_orange{ background: #FAA61A; }
+        .meter_red{ background: #F04747; }
+        .meter_value{ padding-left: 8px; }
+        table { width: 100%; margin-bottom: 50px; }
+        th, td { padding: 0px 6px; text-align: left; border-bottom: 1px solid #5d5d5d; }
+        nav { display: block; padding: 8px 10px; background: #2f3136; }
+        nav a {
+            color: #bfbfbf;
+            padding: 0.5em;
+            display: inline-block;
+            text-decoration: none;
+        }
+        nav a:hover{
+            background: #36393f;
+            color:#cecece;
+            border-radius: 4px;
+        }
+        .upload-script, .button, button, input[type="submit"], input[type="reset"], input[type="button"] {
+            display: inline-block;
+            height: 38px;
+            padding: 0 25px;
+            color:#fff;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 38px;
+            letter-spacing: .1rem;
+            text-transform: uppercase;
+            text-decoration: none;
+            white-space: nowrap;
+            background: #2675eb;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+        button:hover, input[type="submit"]:hover, input[type="reset"]:hover, input[type="button"]:hover {
+            background: #42444a; 
+        }
+        button[id="nav"]:hover{
+            background: #42444a; 
+            font-size: 24px;
+        }
+        input[type="email"], input[type="number"], input[type="search"], input[type="text"], input[type="tel"], input[type="url"], input[type="password"], textarea, select {
+            height: 38px;
+            padding: 6px 10px;
+            background-color: #2f3136;
+            border-radius: 4px;
+            box-shadow: none;
+            box-sizing: border-box;
+            color: #d4d4d4;
+            border: none;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+        .switch input.switch-input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .switch .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+            border-radius: 20px;
+        }
+        .switch .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 2px; 
+            bottom: 2px; 
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        .switch input.switch-input:checked + .slider {
+            background-color: #2196F3;
+        }
+        .switch input.switch-input:focus + .slider {
+            box-shadow: 0 0 1px #2196F3;
+        }
+        .switch input.switch-input:checked + .slider:before {
+            -webkit-transform: translateX(20px);
+            -ms-transform: translateX(20px);
+            transform: translateX(20px);
+        }
+        .switch .slider.round { border-radius: 20px; }
+        .switch .slider.round:before { border-radius: 50%; }
+        .setting { width: 100% !important; max-width: 284px !important; }
+        input[type="file"] { display: none; }
+        .container { width: 100%; margin-left: auto; margin-right: auto; max-width: 1140px; }
+        .row { position: relative; width: 100%; }
+        .row [class^="col"] { float: left; margin: 0.25rem 2%; min-height: 0.125rem; }
+        .col-1, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9, .col-10, .col-11, .col-12 { width: 96%; }
+        .row::after { content: ""; display: table; clear: both; }
+        .hidden-sm { display: none; }
+        @media only screen and (min-width: 45em) {
+            .col-1 { width: 4.33%; }
+            .col-2 { width: 12.66%; }
+            .col-3 { width: 21%; }
+            .col-4 { width: 29.33%; }
+            .col-5 { width: 37.66%; }
+            .col-6 { width: 46%; }
+            .col-7 { width: 54.33%; }
+            .col-8 { width: 62.66%; }
+            .col-9 { width: 71%; }
+            .col-10 { width: 79.33%; }
+            .col-11 { width: 87.66%; }
+            .col-12 { width: 96%; }
+            .hidden-sm { display: block; }
+        }
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #02b902;
+            color: white;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 16px;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            z-index: 999;
+        }
+        nav a {
+            padding: 4px 14px;
+            padding-bottom: 10px;
+            margin: 11px 13px;
+            text-decoration: none;
+            color: #fff;
+            background-color: #ff3300;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            position: relative;
+        }
+    </style>
+    <script>
+const LANG_RES = {
+    en: {
+        TIMEZONE: "1. Time Zone",
+        SYNCTIME: "Synchronize time from browser",
+        DISPLAYMODE: "2. Display Mode",
+        DISPLAY_DIGIT: "Display 4-digit on clock:",
+        TURN_OFF: "TURN OFF",
+        COUNTDOWN_5: "5 MINUTES COUNTDOWN",
+        COUNTDOWN_1: "1 MINUTES COUNTDOWN",
+        SHOW_TIME: "SHOW TIME",
+        TIMER_CONTROL: "TIMER CONTROL",
+        SETTINGS: "3. Settings",
+        SERVO_SILENT: "Servo Silent Mode (Only effective in normal time display mode)",
+        HOURS_12: "12 Hours",
+        SLEEP_DURATION: "4. Sleep Duration",
+        ENABLE: "Enable:",
+        START_TIME: "Start Time:",
+        END_TIME: "End Time:",
+        FIRMWARE_UPDATE: "5. Firmware Update",
+        UPLOAD: "UPLOAD",
+        EMAIL: "E-Mail:",
+        SAVED_SUCCESS: "Saved successfully!",
+        SAVED_FAIL: "Saved failed!",
+        REQUEST_FAIL: "Request failed, please try again... ",
+        SENT_SUCCESS: "Sent successfully!",
+        PLEASE_ENTER_4DIGIT: "Please enter a 4-digit number!",
+        PLEASE_ENTER_VALID_4DIGIT: "Please enter a valid 4-digit number!",
+        PLEASE_ENTER_RANGE: "Please enter a number between 0000 and 9999!",
+        FAILED_PARSE: "Failed to parse configuration data.",
+		LABEL_TIMEZONE: "TimeZone:",
+        LABEL_MINUTEOFFSET: "MinuteOffset:"
+    },
+    zh: {
+        TIMEZONE: "1. 时区设置",
+        SYNCTIME: "从浏览器同步时间",
+        DISPLAYMODE: "2. 显示模式",
+        DISPLAY_DIGIT: "设置钟表4位数码管显示：",
+        TURN_OFF: "关闭显示",
+        COUNTDOWN_5: "5分钟倒计时",
+        COUNTDOWN_1: "1分钟倒计时",
+        SHOW_TIME: "显示时间",
+        TIMER_CONTROL: "计时器控制",
+        SETTINGS: "3. 设置",
+        SERVO_SILENT: "舵机静音模式（仅在正常时间显示模式下有效）",
+        HOURS_12: "12小时制",
+        SLEEP_DURATION: "4. 睡眠时段",
+        ENABLE: "启用：",
+        START_TIME: "开始时间：",
+        END_TIME: "结束时间：",
+        FIRMWARE_UPDATE: "5. 固件升级",
+        UPLOAD: "上传",
+        EMAIL: "邮箱：",
+        SAVED_SUCCESS: "保存成功！",
+        SAVED_FAIL: "保存失败！",
+        REQUEST_FAIL: "请求失败，请重试...",
+        SENT_SUCCESS: "发送成功！",
+        PLEASE_ENTER_4DIGIT: "请输入4位数字！",
+        PLEASE_ENTER_VALID_4DIGIT: "请输入有效的4位数字！",
+        PLEASE_ENTER_RANGE: "请输入0000~9999之间的数字！",
+        FAILED_PARSE: "配置数据解析失败。",
+        LABEL_TIMEZONE: "时区：",
+        LABEL_MINUTEOFFSET: "分钟偏移："
+    }
+};
+function getLang() {
+    const lang = navigator.language || navigator.userLanguage || '';
+    return lang.startsWith('zh') ? 'zh' : 'en';
+}
+const RES = LANG_RES[getLang()];
+window.addEventListener('DOMContentLoaded', function() {
+    // 通过id设置所有文案
+    const map = {
+        "title-timezone": RES.TIMEZONE,
+        "btn-synctime": RES.SYNCTIME,
+        "title-displaymode": RES.DISPLAYMODE,
+        "label-displaydigit": RES.DISPLAY_DIGIT,
+        "btn-turnoff": RES.TURN_OFF,
+        "btn-countdown5": RES.COUNTDOWN_5,
+        "btn-countdown1": RES.COUNTDOWN_1,
+        "btn-showtime": RES.SHOW_TIME,
+        "btn-timer": RES.TIMER_CONTROL,
+        "title-settings": RES.SETTINGS,
+        "span-servosilent": RES.SERVO_SILENT,
+        "span-12hours": RES.HOURS_12,
+        "title-sleep": RES.SLEEP_DURATION,
+        "span-enable": RES.ENABLE,
+        "span-starttime": RES.START_TIME,
+        "span-endtime": RES.END_TIME,
+        "title-firmware": RES.FIRMWARE_UPDATE,
+        "btn-upload": RES.UPLOAD,
+        "span-email-label": RES.EMAIL,
+        "label-timezone": RES.LABEL_TIMEZONE,
+        "label-minuteoffset": RES.LABEL_MINUTEOFFSET
+    };
+    for (const id in map) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = map[id];
+    }
+});
+function showPopup(messageKey, closeAfter, bg) {
+    const popup = document.getElementById('popup');
+    popup.textContent = RES[messageKey] || messageKey;
+    popup.style.opacity = '1';
+    popup.style.backgroundColor = bg;
+    setTimeout(() => {
+        popup.style.opacity = '0';
+    }, closeAfter);
+}
+    </script>
+</head>
+<body>
+    <div style="text-align:center;padding:18px 0 0 0;font-size:2.2em;font-weight:bold;color:#2675eb;">CyberClock</div>
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div id="popup" class="popup"></div>
+                <h1 id="title-timezone">1. Time Zone</h1>
+            </div>
+            <div class="col-12">
+                <span id="label-timezone">TimeZone:</span>
+                <select id="tz" onchange="set_timezone()">
+                    <option value="-12">UTC-12:00 - International Date Line West</option>
+                    <option value="-11">UTC-11:00 - Samoa Standard Time</option>
+                    <option value="-10">UTC-10:00 - Hawaii-Aleutian Standard Time</option>
+                    <option value="-9">UTC-9:00 - Alaska Standard Time</option>
+                    <option value="-8">UTC-8:00 - Pacific Standard Time</option>
+                    <option value="-7">UTC-7:00 - Mountain Standard Time</option>
+                    <option value="-6">UTC-6:00 - Central Standard Time</option>
+                    <option value="-5">UTC-5:00 - Eastern Standard Time</option>
+                    <option value="-4">UTC-4:00 - Atlantic Standard Time</option>
+                    <option value="-3">UTC-3:00 - Argentina, Brazil, Uruguay Standard Time</option>
+                    <option value="-2">UTC-2:00 - Brasilia Standard Time</option>
+                    <option value="-1">UTC-1:00 - Cape Verde, Azores Standard Time</option>
+                    <option value="0">UTC+0:00 - Greenwich Mean Time</option>
+                    <option value="1">UTC+1:00 - Central European Time</option>
+                    <option value="2">UTC+2:00 - Eastern European Time</option>
+                    <option value="3">UTC+3:00 - Moscow Standard Time</option>
+                    <option value="4">UTC+4:00 - Azerbaijan Standard Time</option>
+                    <option value="5">UTC+5:00 - Pakistan Standard Time</option>
+                    <option value="6">UTC+6:00 - Bangladesh Standard Time</option>
+                    <option value="7">UTC+7:00 - Indochina Time</option>
+                    <option value="8">UTC+8:00 - China, Singapore Standard Time</option>
+                    <option value="9">UTC+9:00 - Japan Standard Time</option>
+                    <option value="10">UTC+10:00 - Australian Eastern Standard Time</option>
+                    <option value="11">UTC+11:00 - Vanuatu Standard Time</option>
+                </select>
+                <p>
+                <span id="label-minuteoffset">MinuteOffset:</span>
+                <select id="mtz" onchange="set_timezone()">
+                    <option value="0">0 Minute</option>
+                    <option value="15">15 Minutes</option>
+                    <option value="30">30 Minutes</option>
+                    <option value="45">45 Minutes</option>
+                </select>
+            </div>
+            <p>
+            <div class="col-12">
+                <button id="btn-synctime" class="button-primary left" onclick="sync_time()">Synchronize time from browser</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <h1 id="title-displaymode">2. Display Mode</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <label id="label-displaydigit" for="digit">Display 4-digit on clock:</label>
+                <input type="text" id="digit" placeholder="1024" style="margin-right:10px;">
+                <button class="button-primary" onclick="set_theme(1)">Send</button>
+            </div>
+            <p>
+            <div class="col-12">
+                <button class="button-primary left btn-theme" onclick="set_theme(4)">----</button>
+                <button class="button-primary left btn-theme" onclick="set_digit(0)">0000</button>
+                <button class="button-primary left btn-theme" onclick="set_digit(8888)">8888</button>
+                <button id="btn-turnoff" class="button-primary left btn-theme" onclick="set_theme(7)">TURN OFF</button>
+                <button id="btn-countdown5" class="button-primary left btn-theme" onclick="set_theme(5)">5 MINUTES COUNTDOWN</button>
+                <button id="btn-countdown1" class="button-primary left btn-theme" onclick="set_theme(6)">1 MINUTES COUNTDOWN</button>
+                <button id="btn-showtime" class="button-primary left btn-theme" onclick="set_theme(3)">SHOW TIME</button>
+                <button id="btn-timer" class="button-primary left btn-theme" onclick="window.location.href='timer.html'">TIMER CONTROL</button>
+            </div>
+            <p>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <h1 id="title-settings">3. Settings</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12" style="display: flex; align-items: center; gap: 18px;">
+                <label class="switch" style="margin-bottom:0; flex-shrink:0;">
+                    <input type="checkbox" class="switch-input" id="servosilent" onchange="set_silent()">
+                    <span class="slider round"></span>
+                </label>
+                <span id="span-servosilent" style="flex:1; min-width:0; word-break:break-all; white-space:normal;">Servo Silent Mode (Only effective in normal time display mode)</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-4">
+                <label class="switch">
+                    <input type="checkbox" class="switch-input" id="h1224" onchange="set_12hours()">
+                    <span class="slider round"></span>
+                </label>
+                <span id="span-12hours" style="margin-left:10px;">12 Hours</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <h1 id="title-sleep">4. Sleep Duration</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-4">
+                <span id="span-enable">Enable:</span>
+                <label class="switch">
+                    <input type="checkbox" class="switch-input" id="time_brt_en" name="time_brt_en" onchange="set_time_brt()">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            <div class="col-4">
+                <span id="span-starttime">Start Time:</span><br>
+                <select id="time1_hour" style="width:60px" onchange="set_time_brt()">
+                    <!-- 0-23小时 -->
+                    <option value="0">00</option><option value="1">01</option><option value="2">02</option><option value="3">03</option><option value="4">04</option><option value="5">05</option><option value="6">06</option><option value="7">07</option><option value="8">08</option><option value="9">09</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22" selected>22</option><option value="23">23</option>
+                </select> :
+                <select id="time1_minute" style="width:60px" onchange="set_time_brt()">
+                    <!-- 0-59分钟 -->
+                    <option value="0">00</option><option value="5">05</option><option value="10">10</option><option value="15">15</option><option value="20">20</option><option value="25">25</option><option value="30">30</option><option value="35">35</option><option value="40">40</option><option value="45">45</option><option value="50">50</option><option value="55">55</option>
+                </select>
+            </div>
+            <div class="col-4">
+                <span id="span-endtime">End Time:</span><br>
+                <select id="time2_hour" style="width:60px" onchange="set_time_brt()">
+                    <!-- 0-23小时 -->
+                    <option value="0">00</option><option value="1">01</option><option value="2">02</option><option value="3">03</option><option value="4">04</option><option value="5">05</option><option value="6">06</option><option value="7" selected>07</option><option value="8">08</option><option value="9">09</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option>
+                </select> :
+                <select id="time2_minute" style="width:60px" onchange="set_time_brt()">
+                    <!-- 0-59分钟 -->
+                    <option value="0">00</option><option value="5">05</option><option value="10">10</option><option value="15">15</option><option value="20">20</option><option value="25">25</option><option value="30">30</option><option value="35">35</option><option value="40">40</option><option value="45">45</option><option value="50">50</option><option value="55">55</option>
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <h1 id="title-firmware">5. Firmware Update</h1>
+                <button id="btn-upload" class="red" onclick="window.open('/update.html', '_blank')">UPLOAD</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12"><br /></div>
+        </div>
+    </div>
+    <div id="build-info" style="text-align:center;color:#888888;font-size:1em;margin:24px 0 10px 0;">
+        <span id="fw-version"></span> &nbsp; &nbsp; <span id="span-email-label">E-Mail:</span><a href="mailto:qtoy100@gmail.com" style="color:#888888;text-decoration:underline;">qtoy100@gmail.com</a>
+    </div>
+    <script>
+function getE(name){ return document.getElementById(name);}
+function send_http(url){
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url, true);
+    xhr.send();
+}
+function showToast(msg) {
+    var popup = document.getElementById('popup');
+    popup.innerText = msg;
+    popup.style.opacity = 1;
+    setTimeout(function() {
+        popup.style.opacity = 0;
+    }, 1200);
+}
+function getResponse(adr, callback, timeoutCallback, timeout, method){
+    if(timeoutCallback === undefined) {
+        timeoutCallback = function(){
+            showPopup("REQUEST_FAIL", 2000, "#dc0d04");
+        };
+    }
+    if(timeout === undefined) timeout = 20000; 
+    if(method === undefined) method = "GET";
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function() {
+        if(xmlhttp.readyState == 4){
+            if(xmlhttp.status == 200){
+                callback(xmlhttp.responseText);
+            }
+            else if(xmlhttp.status == 404){
+            }
+            else timeoutCallback();
+        }
+    };
+    xmlhttp.open(method, adr, true);
+    xmlhttp.send();
+    xmlhttp.timeout = timeout;
+    xmlhttp.ontimeout = timeoutCallback;
+}
+function set_silent() {
+    var servosilent = document.getElementById('servosilent');
+    var url = servosilent.checked ? "/set?servosilent=1" : "/set?servosilent=0";
+    send_http(url);
+    showToast(RES.SENT_SUCCESS);
+}
+function set_12hours() {
+    var h1224 = document.getElementById('h1224');
+    var url = h1224.checked ? "/set?h=12" : "/set?h=24";
+    send_http(url);
+    showToast(RES.SENT_SUCCESS);
+}
+function set_time_brt(){
+    var enable = getE("time_brt_en");
+    var h1 = getE("time1_hour").value;
+    var m1 = getE("time1_minute").value;
+    var h2 = getE("time2_hour").value;
+    var m2 = getE("time2_minute").value;
+    var en = enable.checked ? 1 : 0;
+    var url = "/set?t1h="+h1+"&t1m="+m1+"&t2h="+h2+"&t2m="+m2+"&en="+en;
+    send_http(url);
+    showToast(RES.SENT_SUCCESS);
+}
+function set_timezone(){
+    var tz = document.getElementById('tz').value;
+    var mtz = document.getElementById('mtz').value;
+    var url = "/set?tz="+tz+"&mtz="+mtz;
+    send_http(url);	
+    showToast(RES.SENT_SUCCESS);
+}
+function sync_time(){
+    var currentTime = Math.floor(Date.now() / 1000);
+    var url = '/set?time=' + currentTime;
+    var tz = document.getElementById('tz').value;
+    var mtz = document.getElementById('mtz').value;
+    url += '&tz=' + tz + '&mtz=' + mtz;
+    send_http(url);
+    showToast(RES.SENT_SUCCESS);
+}
+function set_digit(d){
+    var url = "/set?digit="+d;
+    send_http(url);
+    showToast(RES.SENT_SUCCESS);
+}
+function set_theme(th){
+    if(th == 1){
+        var x = getE("digit");
+        if(x.value == "") {
+            showToast(RES.PLEASE_ENTER_4DIGIT);
+            x.focus();
+            return;
+        }
+        if(isNaN(x.value) || x.value.length != 4) {
+            showToast(RES.PLEASE_ENTER_VALID_4DIGIT);
+            x.focus();
+            return;
+        }
+        if(x.value < 0 || x.value > 9999) {
+            showToast(RES.PLEASE_ENTER_RANGE);
+            x.focus();
+            return;
+        }
+        if(x.value.length < 4) {
+            x.value = x.value.padStart(4, '0');
+        }
+        var url = "/set?digit="+x.value;
+        send_http(url);
+        showToast(RES.SENT_SUCCESS);
+    } else {
+        var url = "/set?mode="+th;
+        send_http(url);
+        showToast(RES.SENT_SUCCESS);
+    }
+}
+function getconfig() {
+    getResponse('/get_config', function(responseText) {
+        try {
+            var res = JSON.parse(responseText);
+        } catch(e) {
+            showToast(RES.FAILED_PARSE);
+            return;
+        }
+
+        if(res.tz !== undefined) document.getElementById('tz').value = res.tz;
+        if(res.mtz !== undefined) document.getElementById('mtz').value = res.mtz;
+        if(res.servosilent !== undefined) document.getElementById('servosilent').checked = !!res.servosilent;
+        if(res.sleep_en !== undefined) document.getElementById('time_brt_en').checked = !!res.sleep_en;
+        if(res.t1h !== undefined) getE('time1_hour').value = res.t1h;
+        if(res.t1m !== undefined) getE('time1_minute').value = res.t1m;
+        if(res.t2h !== undefined) getE('time2_hour').value = res.t2h;
+        if(res.t2m !== undefined) getE('time2_minute').value = res.t2m;
+    });
+}
+window.onload = function() {
+    getconfig();
+    getResponse('/get_config', function(responseText) {
+        try {
+            var res = JSON.parse(responseText);
+            if(res.version !== undefined) {
+                var fwVer = document.getElementById('fw-version');
+                if(fwVer) fwVer.textContent = res.version;
+            }
+        } catch(e) {}
+    });
+};
+    </script>
+</body>
+</html>
